@@ -1,0 +1,33 @@
+groups:
+  - name: api-slo
+    interval: 30s
+    rules:
+      # A recording rule the alerts below are built on.
+      - record: job:api_error_ratio:rate5m
+        expr: |
+          sum(rate(http_requests_total{job="api",status_class="5xx"}[5m]))
+          / sum(rate(http_requests_total{job="api"}[5m]))
+
+      # (1) Did not fire during a six-hour outage in which the service was
+      # returning 503 to everything and then stopped responding entirely.
+      - alert: ApiErrorRatioHigh
+        expr: job:api_error_ratio:rate5m > 0.05
+        for: 10m
+        labels: {severity: page}
+        annotations:
+          summary: "api error ratio is {{ $value | humanizePercentage }}"
+
+      # (2) Added after a previous incident, specifically to catch the service
+      # being gone. Also did not fire.
+      - alert: ApiDown
+        expr: up{job="api-service"} == 0
+        for: 5m
+        labels: {severity: page}
+
+      # (3) Fires reliably. Nobody has ever acted on it.
+      - alert: ApiLatencyHigh
+        expr: |
+          histogram_quantile(0.99,
+            sum by (le) (rate(http_request_duration_seconds_bucket{job="api"}[5m]))) > 1
+        for: 5m
+        labels: {severity: page}
