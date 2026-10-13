@@ -1,0 +1,6 @@
+services:
+  api:
+    build: .
+    volumes:
+      - ./:/app
+    command: node index.js

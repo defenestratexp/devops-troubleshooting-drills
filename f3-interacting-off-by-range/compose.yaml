@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD: pw
+      POSTGRES_DB: app
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app"]
+      interval: 2s
+      retries: 25
+  api:
+    image: node:24-alpine
+    working_dir: /app
+    volumes:
+      - ./app:/app
+    ports:
+      - "7799:7799"
+    environment:
+      PGHOST: db
+      PGUSER: postgres
+      PGPASSWORD: pw
+      PGDATABASE: app
+    depends_on:
+      db:
+        condition: service_healthy
+    command: sh -c "npm i --silent pg >/dev/null 2>&1 && node api.js"

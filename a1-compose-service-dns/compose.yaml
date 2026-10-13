@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: devpass
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      retries: 20
+  api:
+    image: node:24-alpine
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+    command: >
+      node -e "
+        const net=require('net');
+        const s=net.connect(Number(process.env.DB_PORT), process.env.DB_HOST, ()=>{
+          console.log('OK connected'); s.end(); process.exit(0);
+        });
+        s.on('error', e => { console.error('FAIL', e.code, e.message); process.exit(1); });
+      "

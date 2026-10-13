@@ -1,0 +1,13 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: devpass
+    command: ["sh","-c","sleep 6 && exec docker-entrypoint.sh postgres"]
+  api:
+    image: postgres:16-alpine
+    depends_on:
+      - db
+    environment:
+      PGPASSWORD: devpass
+    command: ["sh","-c","psql -h db -U postgres -c 'select 1' >/dev/null 2>&1 && echo 'OK db ready'"]

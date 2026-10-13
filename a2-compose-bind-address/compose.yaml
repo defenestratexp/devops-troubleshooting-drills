@@ -1,0 +1,9 @@
+services:
+  api:
+    image: node:24-alpine
+    ports:
+      - "8080:3000"
+    working_dir: /app
+    volumes:
+      - ./app:/app:ro
+    command: node server.js

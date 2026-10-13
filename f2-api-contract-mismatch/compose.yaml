@@ -1,0 +1,9 @@
+services:
+  api:
+    image: node:24-alpine
+    working_dir: /app
+    volumes:
+      - ./app:/app
+    ports:
+      - "7788:7788"
+    command: node api.js

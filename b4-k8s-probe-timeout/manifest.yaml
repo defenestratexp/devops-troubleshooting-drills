@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: practice
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slowstart
+  namespace: practice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: slowstart
+  template:
+    metadata:
+      labels:
+        app: slowstart
+    spec:
+      containers:
+        - name: app
+          image: python:3.12-alpine
+          command:
+            - sh
+            - -c
+            - |
+              cat > /srv.py <<'EOF'
+              import http.server, time
+              class H(http.server.BaseHTTPRequestHandler):
+                  def do_GET(self):
+                      time.sleep(1.6)          # a real dependency check, not a bug
+                      self.send_response(200); self.end_headers(); self.wfile.write(b'ok')
+                  def log_message(self, *a): pass
+              http.server.HTTPServer(('0.0.0.0', 8080), H).serve_forever()
+              EOF
+              python /srv.py
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            periodSeconds: 10

@@ -1,0 +1,7 @@
+services:
+  worker:
+    image: node:24-alpine
+    working_dir: /app
+    volumes:
+      - ./app:/app:ro
+    command: sh -c "node worker.js &"

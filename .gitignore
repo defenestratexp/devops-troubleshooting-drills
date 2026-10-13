@@ -1,0 +1,10 @@
+# Dependency trees belong to the exercise, not to the repository. Several of the
+# app-level drills ship a package.json; the modules are restored by running the
+# exercise, and committing them would multiply the file count roughly fivefold.
+node_modules/
+__pycache__/
+*.pyc
+.terraform/
+*.tfstate
+*.tfstate.*
+.env.local
