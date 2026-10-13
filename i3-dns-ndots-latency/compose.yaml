@@ -1,0 +1,31 @@
+networks:
+  drill:
+    ipam:
+      config:
+        - subnet: 172.31.77.0/24
+
+services:
+  dns:
+    image: python:3.12-slim
+    command: ["python", "-u", "/srv/dnsd.py"]
+    volumes:
+      - ./dnsd.py:/srv/dnsd.py:ro
+    networks:
+      drill:
+        ipv4_address: 172.31.77.10
+
+  # The resolver configuration under test. This is the resolv.conf a Kubernetes
+  # pod gets by default, written in compose terms.
+  client:
+    image: debian:12-slim
+    command: ["sleep", "infinity"]
+    depends_on: [dns]
+    dns:
+      - 172.31.77.10
+    dns_search:
+      - svc.drill.local
+      - drill.local
+    dns_opt:
+      - ndots:5
+    networks:
+      - drill
