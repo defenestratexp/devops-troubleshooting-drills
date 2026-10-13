@@ -1,0 +1,68 @@
+{
+  "vpc_cidr": "10.0.0.0/16",
+
+  "subnets": {
+    "public-a":  { "cidr": "10.0.1.0/24", "route_table": "public",  "nacl": "public",  "maps_public_ip": true },
+    "private-a": { "cidr": "10.0.2.0/24", "route_table": "private", "nacl": "private", "maps_public_ip": false }
+  },
+
+  "route_tables": {
+    "public": [
+      { "dest": "10.0.0.0/16", "target": "local" },
+      { "dest": "0.0.0.0/0",   "target": "igw-0a1b2c" }
+    ],
+    "private": [
+      { "dest": "10.0.0.0/16", "target": "local" }
+    ]
+  },
+
+  "nat_gateways": {
+    "nat-0f9e8d": { "subnet": "public-a" }
+  },
+
+  "nacls": {
+    "public": {
+      "_comment": "left as the AWS default network ACL: allow everything, both directions. Security groups are the control here.",
+      "ingress": [
+        { "rule": 100, "action": "allow", "protocol": "-1", "ports": "1-65535", "cidr": "0.0.0.0/0" }
+      ],
+      "egress": [
+        { "rule": 100, "action": "allow", "protocol": "-1", "ports": "1-65535", "cidr": "0.0.0.0/0" }
+      ]
+    },
+    "private": {
+      "ingress": [
+        { "rule": 100, "action": "allow", "protocol": "tcp", "ports": "8080", "cidr": "10.0.0.0/16" }
+      ],
+      "egress": [
+        { "rule": 100, "action": "allow", "protocol": "tcp", "ports": "443",  "cidr": "0.0.0.0/0" },
+        { "rule": 110, "action": "allow", "protocol": "tcp", "ports": "80",   "cidr": "0.0.0.0/0" }
+      ]
+    }
+  },
+
+  "security_groups": {
+    "alb": {
+      "ingress": [
+        { "protocol": "tcp", "ports": "443", "source": "0.0.0.0/0" },
+        { "protocol": "tcp", "ports": "22",  "source": "0.0.0.0/0" }
+      ],
+      "egress": [
+        { "protocol": "tcp", "ports": "1-65535", "source": "0.0.0.0/0" }
+      ]
+    },
+    "app": {
+      "ingress": [
+        { "protocol": "tcp", "ports": "8080", "source": "10.0.99.0/24" }
+      ],
+      "egress": [
+        { "protocol": "tcp", "ports": "1-65535", "source": "0.0.0.0/0" }
+      ]
+    }
+  },
+
+  "instances": {
+    "alb": { "subnet": "public-a",  "security_group": "alb" },
+    "app": { "subnet": "private-a", "security_group": "app" }
+  }
+}

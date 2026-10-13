@@ -1,0 +1,20 @@
+{
+  "_note": "Key policy for the CMK the bucket uses for SSE-KMS. Account 111122223333.",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "EnableRootPermissions",
+      "Effect": "Allow",
+      "Principal": { "AWS": "arn:aws:iam::111122223333:root" },
+      "Action": "kms:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowProducerEncrypt",
+      "Effect": "Allow",
+      "Principal": { "AWS": "arn:aws:iam::111122223333:role/DataProducer" },
+      "Action": ["kms:Encrypt", "kms:GenerateDataKey"],
+      "Resource": "*"
+    }
+  ]
+}

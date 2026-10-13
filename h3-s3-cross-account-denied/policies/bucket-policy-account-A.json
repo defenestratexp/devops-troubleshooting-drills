@@ -1,0 +1,16 @@
+{
+  "_note": "Bucket policy on n9n-data-exchange, owned by account 111122223333.",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowPartnerRead",
+      "Effect": "Allow",
+      "Principal": { "AWS": "arn:aws:iam::444455556666:role/PartnerReader" },
+      "Action": ["s3:GetObject", "s3:ListBucket"],
+      "Resource": [
+        "arn:aws:s3:::n9n-data-exchange",
+        "arn:aws:s3:::n9n-data-exchange/*"
+      ]
+    }
+  ]
+}

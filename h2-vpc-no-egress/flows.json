@@ -1,0 +1,16 @@
+[
+  { "why": "the app pulls OS packages and talks to S3 over HTTPS",
+    "from": "app", "to": "internet", "port": 443, "expect": "ALLOW" },
+
+  { "why": "the load balancer has to reach the application port",
+    "from": "alb", "to": "app", "port": 8080, "expect": "ALLOW" },
+
+  { "why": "the load balancer serves HTTPS to the world",
+    "from": "internet", "to": "alb", "port": 443, "expect": "ALLOW" },
+
+  { "why": "nothing on the internet may reach SSH",
+    "from": "internet", "to": "alb", "port": 22, "expect": "DENY" },
+
+  { "why": "the private subnet must not be reachable from outside",
+    "from": "internet", "to": "app", "port": 8080, "expect": "DENY" }
+]

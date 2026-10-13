@@ -1,0 +1,51 @@
+[
+  { "why": "the pipeline downloads the previous artifact",
+    "action": "s3:GetObject",
+    "resource": "arn:aws:s3:::n9n-artifacts/build/app.tar",
+    "expect": "Allow" },
+
+  { "why": "the pipeline uploads the new artifact",
+    "action": "s3:PutObject",
+    "resource": "arn:aws:s3:::n9n-artifacts/build/app.tar",
+    "expect": "Allow" },
+
+  { "why": "the pipeline lists the bucket to find the latest build",
+    "action": "s3:ListBucket",
+    "resource": "arn:aws:s3:::n9n-artifacts",
+    "expect": "Allow" },
+
+  { "why": "artifacts are immutable; retention is the lifecycle policy's job",
+    "action": "s3:DeleteObject",
+    "resource": "arn:aws:s3:::n9n-artifacts/build/app.tar",
+    "expect": "Deny" },
+
+  { "why": "the deploy role has no business reading customer data",
+    "action": "s3:GetObject",
+    "resource": "arn:aws:s3:::n9n-customer-data/export.csv",
+    "expect": "Deny" },
+
+  { "why": "nor writing to it",
+    "action": "s3:PutObject",
+    "resource": "arn:aws:s3:::n9n-customer-data/export.csv",
+    "expect": "Deny" },
+
+  { "why": "the pipeline needs its registry token",
+    "action": "secretsmanager:GetSecretValue",
+    "resource": "arn:aws:secretsmanager:us-east-1:111122223333:secret:n9n/deploy/ecr-token-a1B2c3",
+    "expect": "Allow" },
+
+  { "why": "the production database master password is not a deploy credential",
+    "action": "secretsmanager:GetSecretValue",
+    "resource": "arn:aws:secretsmanager:us-east-1:111122223333:secret:n9n/prod/db-master-X9y8Z7",
+    "expect": "Deny" },
+
+  { "why": "no privilege escalation",
+    "action": "iam:CreateUser",
+    "resource": "arn:aws:iam::111122223333:user/intruder",
+    "expect": "Deny" },
+
+  { "why": "and it certainly cannot delete the bucket",
+    "action": "s3:DeleteBucket",
+    "resource": "arn:aws:s3:::n9n-artifacts",
+    "expect": "Deny" }
+]

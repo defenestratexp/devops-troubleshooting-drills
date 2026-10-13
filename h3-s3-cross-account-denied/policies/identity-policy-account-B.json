@@ -1,0 +1,15 @@
+{
+  "_note": "Attached to role PartnerReader in account 444455556666 (the reader).",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadExchange",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:ListBucket"],
+      "Resource": [
+        "arn:aws:s3:::n9n-data-exchange",
+        "arn:aws:s3:::n9n-data-exchange/*"
+      ]
+    }
+  ]
+}
