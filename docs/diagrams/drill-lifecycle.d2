@@ -1,0 +1,48 @@
+# Renders only in the N9N d2 pipeline (it imports the filer icon library and lib/style.d2); docs/diagrams/*.png is the published copy.
+...@../../lib/style.d2
+...@/mnt/n9n/assets/icons/d2/simple.d2
+...@/mnt/n9n/assets/icons/d2/cncf.d2
+...@/mnt/n9n/assets/icons/d2/tabler.d2
+
+vars: {d2-config: {layout-engine: elk}}
+
+direction: right
+
+title: "DevOps troubleshooting drills — break it, fix it, let verify.sh decide" {class: title}
+
+you: "You\nno AI help,\nnarrate out loud" {class: [svc; tabler-user]}
+
+readme: "1. README.md\nthe symptom, as a\ncolleague reports it\n(+ TASK.md questions)" {class: [svc; tabler-file-text]}
+setup: "2. setup.sh\nbuilds the broken\nsystem (where needed)" {class: [svc; tabler-hammer]}
+fix: "3. diagnose and fix\ncompose.yaml, manifest,\nmain.tf, rules, app code" {class: [svc; tabler-file-code]}
+answers: "or: ANSWERS.md\nreasoning drills,\nscored on mechanisms" {class: [svc; tabler-file-pencil]}
+verify: "4. ./verify.sh\nrebuilds or applies,\nthen checks behaviour,\nnot a particular fix" {class: [svc; tabler-checklist]}
+
+pass: "PASS\nexit 0" {class: [small; tabler-circle-check]}
+fail: "FAIL\nnon-zero,\nprints why" {class: [small; tabler-circle-x]}
+skip: "SKIP\na required tool\nis missing" {class: [small; tabler-player-skip-forward]}
+solution: "5. SOLUTION.md\nafter PASS, or after\n15 minutes stalled" {class: [svc; tabler-book]}
+
+you -> readme {class: flow}
+readme -> setup {class: flow}
+setup -> fix {class: flow}
+readme -> answers {class: async}
+fix -> verify {class: flow}
+answers -> verify {class: async}
+verify -> pass {class: flow}
+verify -> fail {class: flow}
+verify -> skip {class: async}
+fail -> fix: "try again" {class: async}
+pass -> solution {class: flow}
+
+run: "Where the broken system runs — locally, never a real cluster, cloud account or trust store" {
+  class: zone
+  near: bottom-center
+  grid-columns: 5
+  grid-gap: 60
+  compose: "Docker Compose\na, e, f, i, j sets\n(i3: a logging DNS server)" {class: [svc; simple-docker]}
+  k8s: "Kubernetes (k3d or kind)\nb set" {class: [svc; cncf-kubernetes]}
+  tf: "Terraform, local state\nc set, output in out/" {class: [svc; simple-terraform]}
+  sim: "python3 graders\nd2, g2, h1, h2\n(IAM + VPC simulators)" {class: [svc; simple-python]}
+  installers: "setup-k3d.sh,\nsetup-terraform.sh\ninstall into ~/.local/bin" {class: [svc; tabler-download]}
+}

@@ -14,6 +14,10 @@ same way the original did.
 
 ## Running one
 
+![Every drill follows the same loop: symptom, broken system, fix, objective grade](docs/diagrams/drill-lifecycle.png)
+
+*Every drill follows the same loop: symptom, broken system, fix, objective grade.*
+
 ```sh
 cd b2-k8s-crashloop
 cat README.md
